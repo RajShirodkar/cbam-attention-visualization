@@ -64,7 +64,7 @@ def process_image_option_1(image_path):
     img_tensor = transform(img).unsqueeze(0)  # Add batch dimension
 
     # Initialize CBAM
-    model = CBAM(in_planes=3, ratio=1)
+    model = CBAM(in_planes=3)
     model.eval()  # Set to evaluation mode for inference
 
     # Run CBAM

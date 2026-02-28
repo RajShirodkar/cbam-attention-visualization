@@ -2,23 +2,16 @@ import torch
 import torch.nn as nn
 
 class SpatialAttention(nn.Module):
-    def __init__(self, kernel_size=7, dropout_rate=0.1, use_gelu=True):
+    def __init__(self, kernel_size=7):
         super(SpatialAttention, self).__init__()
         # Paper specifies a 7x7 convolution [cite: 1762]
         padding = kernel_size // 2
-        activation = nn.GELU() if use_gelu else nn.ReLU(inplace=True)
         
-        # Enhanced spatial attention with multi-layer convolution [cite: 1762]
+        # Simple 2-layer spatial attention with GELU activation [cite: 1762]
         self.conv = nn.Sequential(
-            nn.Conv2d(2, 16, kernel_size, padding=padding, bias=False),
-            nn.BatchNorm2d(16),
-            activation,
-            nn.Dropout(dropout_rate),
-            nn.Conv2d(16, 8, kernel_size, padding=padding, bias=False),
-            nn.BatchNorm2d(8),
-            activation,
-            nn.Dropout(dropout_rate),
-            nn.Conv2d(8, 1, kernel_size, padding=padding, bias=False)
+            nn.Conv2d(2, 16, kernel_size, padding=padding, bias=True),
+            nn.GELU(),
+            nn.Conv2d(16, 1, kernel_size, padding=padding, bias=True)
         )
         self.sigmoid = nn.Sigmoid()
 

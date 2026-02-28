@@ -2,27 +2,19 @@ import torch
 import torch.nn as nn
 
 class ChannelAttention(nn.Module):
-    def __init__(self, in_planes, ratio=16, dropout_rate=0.1, use_gelu=True):
+    def __init__(self, in_planes, ratio=16):
         super(ChannelAttention, self).__init__()
         # Paper utilizes mean pooling and max pooling [cite: 1755]
         self.avg_pool = nn.AdaptiveAvgPool2d(1)
         self.max_pool = nn.AdaptiveMaxPool2d(1)
         
         hidden_planes = max(in_planes // ratio, 8)
-        activation = nn.GELU() if use_gelu else nn.ReLU(inplace=True)
         
-        # Enhanced MLP with deeper architecture, group norm, and dropout [cite: 1756]
-        # Using GroupNorm instead of BatchNorm for 1x1 spatial dims (works with any batch size)
+        # Simple 2-layer MLP with GELU activation [cite: 1756]
         self.fc = nn.Sequential(
-            nn.Conv2d(in_planes, hidden_planes, 1, bias=False),
-            nn.GroupNorm(1, hidden_planes),
-            activation,
-            nn.Dropout(dropout_rate),
-            nn.Conv2d(hidden_planes, hidden_planes, 1, bias=False),
-            nn.GroupNorm(1, hidden_planes),
-            activation,
-            nn.Dropout(dropout_rate),
-            nn.Conv2d(hidden_planes, in_planes, 1, bias=False)
+            nn.Conv2d(in_planes, hidden_planes, 1, bias=True),
+            nn.GELU(),
+            nn.Conv2d(hidden_planes, in_planes, 1, bias=True)
         )
         # Sigmoid activation function to generate weight map [cite: 1757]
         self.sigmoid = nn.Sigmoid()

@@ -214,7 +214,7 @@ def process_image_dataset(image_dir='images', output_dir='heatmaps'):
     # Import CBAM model
     try:
         from modules.cbam import CBAM
-        model = CBAM(in_planes=3, ratio=1)
+        model = CBAM(in_planes=3)
         model.eval()
         print(f"✅ CBAM model loaded\n")
     except Exception as e:
